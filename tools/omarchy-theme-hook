@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Omarchy theme-set hook: give the Arc Sidebar extension the current theme's
+# colours. The side panel re-reads theme/omarchy.json every couple of seconds.
+# Installed as ~/.config/omarchy/hooks/theme-set.d/arc-sidebar (tools/install).
+
+ext="${ARC_SIDEBAR_DIR:-$HOME/Projects/arc-sidebar}"
+colors="$HOME/.local/state/omarchy/current/theme/colors.toml"
+out="$ext/theme/omarchy.json"
+
+[[ -d $ext/theme ]] || exit 0
+
+if [[ -f $colors ]] && omarchy-theme-color --file "$colors" --all >/dev/null 2>&1; then
+  omarchy-theme-color --file "$colors" --all |
+    jq -Rn '[inputs | split("\t") | select(length == 2) | {(.[0]): .[1]}] | add // {}' >"$out.tmp" &&
+    mv "$out.tmp" "$out"
+else
+  # Themes without colors.toml: fall back to the system light/dark colours.
+  rm -f "$out"
+fi

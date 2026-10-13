@@ -1,0 +1,38 @@
+{
+  "_comment": "First-run contents, curated from the bookmarks in ~/.config/omarchy/extensions/omarchy-menu.jsonc. Only used when the 'Arc Sidebar' bookmark folder doesn't exist yet.",
+  "favourites": [
+    { "title": "Claude", "url": "https://claude.ai/" },
+    { "title": "Gmail", "url": "https://mail.google.com/" },
+    { "title": "Messenger", "url": "https://www.messenger.com/" },
+    { "title": "Discord", "url": "https://discord.com/channels/@me" },
+    { "title": "YouTube", "url": "https://www.youtube.com/" },
+    { "title": "X", "url": "https://x.com/" }
+  ],
+  "spaces": [
+    {
+      "title": "🌿 Personal",
+      "color": "green",
+      "items": [
+        { "title": "Notion", "url": "https://app.notion.com/" },
+        { "title": "Google Photos", "url": "https://photos.google.com/" },
+        { "title": "Google Maps", "url": "https://maps.google.com/" },
+        { "title": "Vault Navigator", "url": "https://homebox.jaguar-munsell.ts.net/vault-navigator/" }
+      ]
+    },
+    {
+      "title": "🏠 Home",
+      "color": "orange",
+      "items": [
+        { "title": "Home Assistant", "url": "http://homebox.jaguar-munsell.ts.net:8123/home/overview" },
+        { "title": "AirTouch", "url": "http://homebox.jaguar-munsell.ts.net:3000/" },
+        {
+          "title": "Homebox",
+          "children": [
+            { "title": "AdGuard", "url": "http://homebox.jaguar-munsell.ts.net:8080/" },
+            { "title": "Agent Browser", "url": "https://homebox.jaguar-munsell.ts.net/browser/" }
+          ]
+        }
+      ]
+    }
+  ]
+}
