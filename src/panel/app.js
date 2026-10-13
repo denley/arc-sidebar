@@ -209,7 +209,9 @@ function SpacePage({ ui, space, current }) {
       onContextMenu=${(e) => { if (e.target === e.currentTarget || e.target.classList.contains('page-fill')) { e.preventDefault(); ui.openMenu(e, spaceMenu(ui, space)); } }}>
       <div class="space-header" onDblClick=${() => ui.setRenaming(`s:${space.id}`)}
         onContextMenu=${(e) => { e.preventDefault(); ui.openMenu(e, spaceMenu(ui, space)); }}>
-        ${space.emoji && html`<span class="space-emoji">${space.emoji}</span>`}
+        ${space.emoji
+          ? html`<span class="space-emoji">${space.emoji}</span>`
+          : html`<span class="space-emoji"><span class="dot" style=${`--dot:var(--dot-${space.color})`} /></span>`}
         <span class="space-name">
           ${renaming
             ? html`<${RenameInput} value=${space.name} onCancel=${() => ui.setRenaming(null)}

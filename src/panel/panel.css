@@ -180,7 +180,7 @@ input, select { font: inherit; color: inherit; }
   font-weight: 600;
   color: var(--fg-soft);
 }
-.space-emoji { font-size: 15px; line-height: 1; }
+.space-emoji { display: grid; place-items: center; min-width: 16px; font-size: 15px; line-height: 1; }
 .space-name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .space-header .icon-btn { opacity: 0; }
 .space-header:hover .icon-btn, .space-header:focus-within .icon-btn { opacity: 1; }

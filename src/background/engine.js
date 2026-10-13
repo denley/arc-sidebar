@@ -662,7 +662,9 @@ export class Engine {
     // Pinned while still loading: the bookmark got the URL as its name.
     if (change.title && bid) {
       const bm = (await this.tree()).bookmarks.get(bid);
-      if (bm && (bm.node.title === bm.node.url || bm.node.title === urlOf(tab))) {
+      const auto = [bm?.node.url, urlOf(tab)].map(normalizeUrl);
+      const t = bm?.node.title || '';
+      if (bm && (auto.includes(normalizeUrl(t)) || auto.includes(normalizeUrl(`https://${t}`)))) {
         await chrome.bookmarks.update(bid, { title: change.title });
       }
     }
@@ -953,7 +955,7 @@ export class Engine {
 
     async addLink({ windowId, parentId, index, title, url }) {
       const parent = parentId ?? (await this.activeSpaceFor(windowId));
-      const b = await chrome.bookmarks.create({ parentId: parent, index, title: title || url, url });
+      const b = await chrome.bookmarks.create({ parentId: parent, index, title: title || url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''), url });
       return b.id;
     },
 

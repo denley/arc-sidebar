@@ -8,7 +8,7 @@ import { cx } from './util.js';
 export function DialogShell({ title, onClose, onSubmit, children, actions }) {
   const ref = useRef(null);
   useEffect(() => {
-    const el = ref.current?.querySelector('[autofocus], input, button.primary');
+    const el = ref.current?.querySelector('[autofocus], input:not([type=checkbox]), select, button.primary');
     el?.focus();
     el?.select?.();
   }, []);
