@@ -1,28 +1,14 @@
 #!/bin/bash
 
-# One-time setup on Omarchy:
-#   - load the extension every time Chromium starts (alongside Omarchy's own
-#     extensions in ~/.config/chromium-flags.conf), and
-#   - keep the sidebar's colours in sync with the Omarchy theme.
-# Restart Chromium afterwards.
+# One-time setup on Omarchy: keep the sidebar's colours in sync with the
+# Omarchy theme. The extension itself is loaded with "Load unpacked" (see
+# README); --load-extension in chromium-flags.conf is ignored when Enhanced
+# Safe Browsing is on.
 
 set -euo pipefail
 
 ext="$(cd "$(dirname "$0")/.." && pwd)"
-flags="$HOME/.config/chromium-flags.conf"
 hook="$HOME/.config/omarchy/hooks/theme-set.d/arc-sidebar"
-
-touch "$flags"
-if grep -q "^--load-extension=.*$ext\(,\|$\)" "$flags"; then
-  echo "Already in $flags"
-elif grep -q "^--load-extension=" "$flags"; then
-  # Same edit Omarchy's own migrations make when they add an extension.
-  sed -i --follow-symlinks "s|^--load-extension=\(.*\)$|--load-extension=\1,$ext|" "$flags"
-  echo "Added to the --load-extension line in $flags"
-else
-  echo "--load-extension=$ext" >>"$flags"
-  echo "Added --load-extension to $flags"
-fi
 
 mkdir -p "$(dirname "$hook")"
 install -m 755 "$ext/tools/omarchy-theme-hook" "$hook"
@@ -30,4 +16,4 @@ ARC_SIDEBAR_DIR="$ext" "$hook"
 echo "Installed theme hook at $hook"
 
 echo
-echo "Restart Chromium, then press Alt+S (or click the extension's toolbar icon) to open the sidebar."
+echo "Now load the extension: chrome://extensions -> Developer mode -> Load unpacked -> $ext"

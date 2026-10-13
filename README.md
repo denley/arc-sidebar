@@ -6,14 +6,13 @@ current Omarchy theme.
 
 ## Install (Omarchy)
 
-```sh
-tools/install
-```
-
-This adds the extension to the `--load-extension` line in
-`~/.config/chromium-flags.conf` (next to Omarchy's own extensions) and installs
-a `theme-set` hook so the sidebar follows the Omarchy theme. Restart Chromium,
-then press **Alt+S** or click the toolbar icon to open the sidebar.
+1. `tools/install` installs a `theme-set` hook so the sidebar follows the
+   Omarchy theme.
+2. In `chrome://extensions`, turn on **Developer mode**, click **Load
+   unpacked** and pick this folder. It stays loaded across restarts. (Adding it
+   to `--load-extension` in `chromium-flags.conf` doesn't work if Enhanced Safe
+   Browsing is on: Chromium ignores that flag then.)
+3. Press **Alt+S** or click the toolbar icon to open the sidebar.
 
 To make Chrome's own tab strip mostly go away: right-click the tab strip, choose
 **Show tabs vertically**, then collapse that strip to its narrow icon rail. Under
