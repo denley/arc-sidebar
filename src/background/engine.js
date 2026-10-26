@@ -481,17 +481,25 @@ export class Engine {
   async rebind(windowId) {
     await this.reconcile(windowId);
     const tree = await this.tree();
-    const tabs = await chrome.tabs.query({ windowId });
+    // Match on urlOf: while session restore is loading a tab, url is empty and
+    // only pendingUrl says where it's going. An empty url matches any bookmark.
+    const tabs = (await chrome.tabs.query({ windowId })).filter((t) => !isNewTabUrl(urlOf(t)));
     const bound = new Set(Object.values(this.s.bindings));
-    for (const [bid, { node, owner }] of tree.bookmarks) {
-      if (!node.url || bound.has(bid)) continue;
-      const last = this.l.lastBound[bid];
-      const tab = tabs.find((t) => !this.s.bindings[t.id] && !isNewTabUrl(urlOf(t))
-        && (owner === 'fav' ? t.pinned : this.spaceOfTab(t) === owner)
-        && ((last && normalizeUrl(t.url) === normalizeUrl(last)) || !isAway(t.url, node.url)));
-      if (tab) {
-        this.bind(tab.id, bid);
-        bound.add(bid);
+    const fits = (t, owner) => (owner === 'fav' ? t.pinned : this.spaceOfTab(t) === owner);
+    // Exact matches on the page each tab was last on go first, so an earlier
+    // bookmark can't take a tab that a later one was on.
+    const passes = [
+      (t, bid) => this.l.lastBound[bid] && normalizeUrl(urlOf(t)) === normalizeUrl(this.l.lastBound[bid]),
+      (t, bid, node) => !isAway(urlOf(t), node.url),
+    ];
+    for (const matches of passes) {
+      for (const [bid, { node, owner }] of tree.bookmarks) {
+        if (!node.url || bound.has(bid)) continue;
+        const tab = tabs.find((t) => !this.s.bindings[t.id] && fits(t, owner) && matches(t, bid, node));
+        if (tab) {
+          this.bind(tab.id, bid);
+          bound.add(bid);
+        }
       }
     }
   }
@@ -508,7 +516,7 @@ export class Engine {
       const sid = this.spaceOfTab(t);
       if (sid && t.url && !isNewTabUrl(t.url)) (spaceUrls[sid] ||= []).length < 60 && spaceUrls[sid].push(t.url);
       const bid = this.s.bindings[t.id];
-      if (bid && tree.bookmarks.has(bid)) lastBound[bid] = t.url;
+      if (bid && tree.bookmarks.has(bid) && !isNewTabUrl(urlOf(t))) lastBound[bid] = urlOf(t);
     }
     // Keep remembered URLs for pinned tabs that aren't open right now.
     for (const [bid, url] of Object.entries(this.l.lastBound)) {

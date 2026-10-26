@@ -167,6 +167,24 @@ try {
   check('Google Maps rebound', !!findPinned(s, 'Google Maps').tab);
   check('Claude favourite rebound', !!s.favourites.find((f) => f.title === 'Claude')?.tab);
 
+  console.log('restart while a favourite tab is still loading');
+  await api('openBookmark', { id: s.favourites.find((f) => f.title === 'Gmail').id });
+  s = await snap();
+  const claudeId = s.favourites.find((f) => f.title === 'Claude').tab.id;
+  const gmailId = s.favourites.find((f) => f.title === 'Gmail').tab.id;
+  await ev(`await chrome.tabs.move(${gmailId}, { index: 0 })`); // ahead of Claude's tab
+  await ev(`await engine.enqueue(() => engine.persistRecovery())`);
+  // Session restore: the tab knows where it's going (pendingUrl) but url is still empty.
+  await ev(`engine.s.bindings = {};
+    self.realQuery = chrome.tabs.query;
+    chrome.tabs.query = async (...a) => (await realQuery.apply(chrome.tabs, a))
+      .map((t) => (t.id === ${gmailId} ? { ...t, url: '', pendingUrl: 'https://mail.google.com/' } : t));`);
+  await ev(`await engine.enqueue(() => engine.rebindAll())`);
+  await ev(`chrome.tabs.query = realQuery`);
+  s = await snap();
+  check('Claude keeps its own tab', s.favourites.find((f) => f.title === 'Claude').tab?.id === claudeId, s.favourites);
+  check('Gmail gets the loading tab', s.favourites.find((f) => f.title === 'Gmail').tab?.id === gmailId, s.favourites);
+
   console.log('spaces');
   const newId = await api('createSpace', { name: 'Work', emoji: '💼', color: 'blue' });
   s = await snap();
